@@ -48,6 +48,13 @@ public class POS_GUI extends JFrame {
     private JButton btnPayment;
 
 
+    public static void main(String[] args) {
+        POS_GUI pos = new POS_GUI();
+        pos.setTitle("Restaurant Management System");
+        pos.pack();
+        pos.setSize(1200, 700);
+        pos.setVisible(true);
+    }
     public POS_GUI (){
 
         //frame.setContentPane(pnlMain);
@@ -291,6 +298,7 @@ public class POS_GUI extends JFrame {
 
                 if(tblReceipt.getSelectedRow() != -1){
                     model.removeRow(tblReceipt.getSelectedRow());
+                    total();
                 }
             }
         });
@@ -303,6 +311,8 @@ public class POS_GUI extends JFrame {
 
                 for(int i = rowCount - 1; i >= 0; i--) {
                     model.removeRow(i);
+                    total();
+                    txtDiscount.setText("");
                 }
             }
         });

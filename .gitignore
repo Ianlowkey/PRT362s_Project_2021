@@ -1,4 +1,7 @@
 # Files To Ignore
 
 /.idea/
+
 *.iml
+*.xml
+Employee.java
