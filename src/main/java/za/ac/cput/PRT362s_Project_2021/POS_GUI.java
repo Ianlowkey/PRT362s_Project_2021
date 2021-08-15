@@ -7,11 +7,17 @@ package za.ac.cput.PRT362s_Project_2021;
  */
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class POS_GUI extends JFrame {
     private JFrame frame = new JFrame();
@@ -36,8 +42,12 @@ public class POS_GUI extends JFrame {
     private JPanel pnlCenter;
     private JPanel pnlEast;
     private DefaultTableModel model;
+    private DefaultTableModel receiptModel;
+    private JTextArea textArea;
+    private FileWriter writer;
     private JList lstItems;
     private JTable tblReceipt;
+    private JTable newReceiptTable;
     private JButton btnDelete;
     private JButton btnSubTotal;
     private JButton btnDeleteOrder;
@@ -46,6 +56,7 @@ public class POS_GUI extends JFrame {
     private JScrollPane scrollItems;
     private JButton btnAdd;
     private JButton btnPayment;
+    private Font font = new Font("Arial", Font.BOLD, 14);
 
 
     public static void main(String[] args) {
@@ -61,6 +72,42 @@ public class POS_GUI extends JFrame {
         add(pnlMain);
         buttonActions();
         total();
+
+        // --------- customizing buttons ------------//
+
+        btnBreakfast.setFont(font);
+        btnBreakfast.setForeground(Color.WHITE);
+        btnBreakfast.setBackground(Color.red);
+        btnMains.setFont(font);
+        btnMains.setForeground(Color.white);
+        btnMains.setBackground(Color.red);
+        btnBurger.setFont(font);
+        btnBurger.setForeground(Color.white);
+        btnBurger.setBackground(Color.red);
+        btnSides.setFont(font);
+        btnSides.setForeground(Color.white);
+        btnSides.setBackground(Color.red);
+        btnDessert.setFont(font);
+        btnDessert.setForeground(Color.white);
+        btnDessert.setBackground(Color.red);
+        btnBeverage.setFont(font);
+        btnBeverage.setForeground(Color.white);
+        btnBeverage.setBackground(Color.red);
+        btnDeleteOrder.setFont(font);
+        btnDeleteOrder.setForeground(Color.white);
+        btnDeleteOrder.setBackground(Color.red);
+        btnDelete.setFont(font);
+        btnDelete.setForeground(Color.white);
+        btnDelete.setBackground(Color.red);
+        btnAdd.setFont(font);
+        btnAdd.setForeground(Color.white);
+        btnAdd.setBackground(new Color(153, 153, 255));
+        btnSubTotal.setFont(font);
+        btnSubTotal.setForeground(Color.WHITE);
+        btnSubTotal.setBackground(new Color(153, 153, 255));
+        btnPayment.setFont(font);
+        btnPayment.setForeground(Color.WHITE);
+        btnPayment.setBackground(new Color(153, 153, 255));
 
 
     }
@@ -82,6 +129,14 @@ public class POS_GUI extends JFrame {
         model.addColumn("Price");
         //model.addColumn("#");
         //model.addColumn("#");
+
+        receiptModel = new DefaultTableModel();
+        newReceiptTable = new JTable(receiptModel);
+        receiptModel.addColumn("Item Name");
+        receiptModel.addColumn("Price");
+
+        textArea = new JTextArea();
+        //writer = new FileWriter("Receipt.txt");
 
 
     }
@@ -323,6 +378,8 @@ public class POS_GUI extends JFrame {
 
                 int discount;
                 double subTotal = 0;
+                double finalTotal = 0;
+                double test1 = 0;
                 //discount = Integer.parseInt(txtDiscount.getText());
                 double totalpay = Double.parseDouble(txtTotal.getText());
                 //txtDiscount.setText("0");
@@ -337,9 +394,10 @@ public class POS_GUI extends JFrame {
 
                     discount = Integer.parseInt(txtDiscount.getText());
                     //subTotal = (totalpay / 100) * discount;
-                    subTotal = (discount * totalpay) / 100;
+                    subTotal = (discount / totalpay) * 100;
+                    finalTotal = totalpay - subTotal;
 
-                    txtSubTotal.setText(Double.toString(subTotal));
+                    txtSubTotal.setText(Double.toString(finalTotal));
                 }
             }
         });
@@ -348,26 +406,60 @@ public class POS_GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                String msg = "Payment Confirmed ?";
+
+                DefaultTableModel selectAllModel = (DefaultTableModel) newReceiptTable.getModel();
+
+
 
                 int reply = JOptionPane.showConfirmDialog(null,
                         "Is Payment Confirmed ?",
                         "Confirm",
                         JOptionPane.YES_NO_OPTION);
 
-                if (reply == JOptionPane.YES_OPTION){
 
-                    JOptionPane.showMessageDialog(null, "Thank you for your support!");
+                        if (reply == JOptionPane.YES_OPTION) {
 
-                    clearTable();
-                    txtTotal.setText("");
-                    txtDiscount.setText("");
-                    txtSubTotal.setText("");
-                }
 
-                else{
-                    JOptionPane.showMessageDialog(null, "Please try again.");
-                }
+                            selectRows(tblReceipt, 0, tblReceipt.getRowCount());
+                            ArrayList<String> selectedItemValues = getSelectedItems(tblReceipt);
+
+
+                            for (String string : selectedItemValues) {
+                                System.out.println(string);
+                                String total = txtSubTotal.getText();
+
+                            }
+
+
+                            //---------------Writing ArrayList (Receipt) to txt File------------------//
+                            try {
+                                FileWriter writer = new FileWriter("Receipt.txt",true);
+                                BufferedWriter outStream = new BufferedWriter(writer);
+                                String total = txtSubTotal.getText();
+
+
+                                for (int a =0; a < selectedItemValues.size(); a++) {
+                                    //String total = txtSubTotal.getText();
+                                    String str = selectedItemValues.get(a) + "\n";
+
+                                    outStream.write(str);
+                                    }
+                                outStream.write("Total: R" + total);
+                                outStream.close();
+                                writer.close();
+                                }catch(IOException ex){
+
+                            }
+
+
+                            tblReceipt.revalidate();
+                            clearTable();
+                            txtTotal.setText("");
+                            txtDiscount.setText("");
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Please try again.");
+                        }
+
 
             }
         });
@@ -395,6 +487,7 @@ public class POS_GUI extends JFrame {
         tblReceipt.getModel();
     }
 
+    //----------------------Calculation to work out total------------------//
     public void total() {
 
         double totalpay = 0;
@@ -405,6 +498,7 @@ public class POS_GUI extends JFrame {
             txtTotal.setText(Double.toString(totalpay));
     }
 
+    //------------------------Clear Receipt Table---------------------//
     public void clearTable(){
 
         int rowCount = tblReceipt.getRowCount();
@@ -414,4 +508,35 @@ public class POS_GUI extends JFrame {
         }
     }
 
+
+    //------------------Selection Mode and Selection Interval for ArrayList-----------------------//
+    public void selectRows(JTable tblReceipt, int start, int end) {
+
+        tblReceipt.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+        tblReceipt.setRowSelectionAllowed(true);
+
+        tblReceipt.setRowSelectionInterval(0, tblReceipt.getModel().getRowCount() -1);
+
+
+    }
+
+    //----------------------- ArrayList To Store TblReceipt Rows------------------------//
+    private ArrayList<String> getSelectedItems(JTable tblReceipt){
+        ArrayList<String> selectedItemValues = new ArrayList<>();
+        Object[] rows = new Object[2];
+
+        int[] selectedRow = tblReceipt.getSelectedRows();
+        int[] selectedCol = tblReceipt.getSelectedColumns();
+        for (int i = 0; i < selectedRow.length; i++){
+            for (int x = 0; x < tblReceipt.getColumnCount() - 2 ; x++){
+                //selectedItemValues.add(String.valueOf(tblReceipt.getValueAt(i, x)));
+                selectedItemValues.add(String.valueOf(tblReceipt.getValueAt(i,1)) + " " +  " R" + String.valueOf(tblReceipt.getValueAt(i, 2)));
+            }
+        }
+        return selectedItemValues;
+    }
+
+
 }
+
