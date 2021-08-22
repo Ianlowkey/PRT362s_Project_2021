@@ -127,23 +127,18 @@ public class POS_GUI extends JFrame {
         model.addColumn("Item ID");
         model.addColumn("Item Name");
         model.addColumn("Price");
-        //model.addColumn("#");
-        //model.addColumn("#");
 
         receiptModel = new DefaultTableModel();
         newReceiptTable = new JTable(receiptModel);
         receiptModel.addColumn("Item Name");
         receiptModel.addColumn("Price");
-
-        textArea = new JTextArea();
-        //writer = new FileWriter("Receipt.txt");
-
-
     }
 
     public void buttonActions() {
 
 
+        String url = "jdbc:mysql://localhost:3306/mysql";
+        String user = "root";
 
         btnBreakfast.addActionListener(new ActionListener() {
             @Override
@@ -154,9 +149,8 @@ public class POS_GUI extends JFrame {
                     itemDTM.setColumnIdentifiers(column);
                     tblItems.setModel(itemDTM);
 
-                String url = "jdbc:mysql://localhost:3306/mysql";
-                String user = "root";
 
+            // Display list for breakfast items
                 try{
                     Connection myConn = DriverManager.getConnection(url, user, null);
                     Statement myStat = myConn.createStatement();
@@ -185,9 +179,8 @@ public class POS_GUI extends JFrame {
                 itemDTM.setColumnIdentifiers(column);
                 tblItems.setModel(itemDTM);
 
-                String url = "jdbc:mysql://localhost:3306/mysql";
-                String user = "root";
 
+            //Display list for mains items
                 try{
                     Connection myConn = DriverManager.getConnection(url, user, null);
                     Statement myStat = myConn.createStatement();
@@ -213,9 +206,8 @@ public class POS_GUI extends JFrame {
                 itemDTM.setColumnIdentifiers(column);
                 tblItems.setModel(itemDTM);
 
-                String url = "jdbc:mysql://localhost:3306/mysql";
-                String user = "root";
 
+                //Display list for sides items
                 try{
                     Connection myConn = DriverManager.getConnection(url, user, null);
                     Statement myStat = myConn.createStatement();
@@ -241,9 +233,8 @@ public class POS_GUI extends JFrame {
                 itemDTM.setColumnIdentifiers(column);
                 tblItems.setModel(itemDTM);
 
-                String url = "jdbc:mysql://localhost:3306/mysql";
-                String user = "root";
 
+            //Display list for burger items
                 try{
                     Connection myConn = DriverManager.getConnection(url, user, null);
                     Statement myStat = myConn.createStatement();
@@ -270,9 +261,7 @@ public class POS_GUI extends JFrame {
                 tblItems.setModel(itemDTM);
 
 
-                String url = "jdbc:mysql://localhost:3306/mysql";
-                String user = "root";
-
+            //Display list for mains items
                 try{
                     Connection myConn = DriverManager.getConnection(url, user, null);
                     Statement myStat = myConn.createStatement();
@@ -298,9 +287,7 @@ public class POS_GUI extends JFrame {
                 itemDTM.setColumnIdentifiers(column);
                 tblItems.setModel(itemDTM);
 
-                String url = "jdbc:mysql://localhost:3306/mysql";
-                String user = "root";
-
+            //Display list for mains items
                 try{
                     Connection myConn = DriverManager.getConnection(url, user, null);
                     Statement myStat = myConn.createStatement();
@@ -326,12 +313,8 @@ public class POS_GUI extends JFrame {
                 TableModel click = tblItems.getModel();
                 int indexs[] = tblItems.getSelectedRows();
                 Object[] rows = new Object[3];
-
-                //TableModel click2 = tblReceipt.getModel();
                 DefaultTableModel click2 = (DefaultTableModel) tblReceipt.getModel();
 
-                //Object[] column = {"#", "Item Name", "Price", "Quantity", "Total"};
-                //model.setColumnIdentifiers(column);
 
                 for (int i = 0; i < indexs.length; i++){
 
@@ -438,12 +421,13 @@ public class POS_GUI extends JFrame {
                                 String total = txtSubTotal.getText();
 
 
+                                outStream.write("\n" + "------ Items ------" + "\n");
                                 for (int a =0; a < selectedItemValues.size(); a++) {
-                                    //String total = txtSubTotal.getText();
-                                    String str = selectedItemValues.get(a) + "\n";
+                                    String str = "--    " + selectedItemValues.get(a) + "\n";
 
                                     outStream.write(str);
                                     }
+                                outStream.write("------ Payment Pricing ------" + "\n");
                                 outStream.write("Total: R" + total);
                                 outStream.close();
                                 writer.close();
@@ -451,6 +435,7 @@ public class POS_GUI extends JFrame {
 
                             }
 
+                            JOptionPane.showMessageDialog(null, "Payment is confimed \n Enjoy your day");
 
                             tblReceipt.revalidate();
                             clearTable();
@@ -464,22 +449,6 @@ public class POS_GUI extends JFrame {
             }
         });
 
-    }
-
-    public void addRowtoTable(Object[] dataRow) {
-
-        DefaultTableModel rDTM = new DefaultTableModel();
-        Object[] column = {"#", "Item Name", "Price", "Quantity", "Total"};
-        rDTM.setColumnIdentifiers(column);
-
-        TableModel click = tblItems.getModel();
-        int indexs[] = tblItems.getSelectedRows();
-        Object[] row = new Object[2];
-        for (int i = 0; i < indexs.length; i++){
-                    row[0] = click.getValueAt(indexs[i], 0);
-                    row[1] = click.getValueAt(indexs[i], 1);
-        }
-        rDTM.addRow(dataRow);
     }
 
     public void tableUpdate(){
