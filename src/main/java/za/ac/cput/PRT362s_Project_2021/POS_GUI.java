@@ -409,7 +409,6 @@ public class POS_GUI extends JFrame {
 
                             }
 
-
                             //---------------Writing ArrayList (Receipt) to txt File------------------//
                             try {
                                 FileWriter writer = new FileWriter("Receipt.txt",true);
