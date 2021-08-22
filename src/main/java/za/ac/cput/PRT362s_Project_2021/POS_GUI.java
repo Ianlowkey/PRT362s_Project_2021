@@ -396,7 +396,6 @@ public class POS_GUI extends JFrame {
                         "Confirm",
                         JOptionPane.YES_NO_OPTION);
 
-
                         if (reply == JOptionPane.YES_OPTION) {
 
 
