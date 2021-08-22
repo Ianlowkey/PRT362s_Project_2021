@@ -392,8 +392,6 @@ public class POS_GUI extends JFrame {
 
                 DefaultTableModel selectAllModel = (DefaultTableModel) newReceiptTable.getModel();
 
-
-
                 int reply = JOptionPane.showConfirmDialog(null,
                         "Is Payment Confirmed ?",
                         "Confirm",
