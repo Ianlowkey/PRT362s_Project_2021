@@ -389,7 +389,6 @@ public class POS_GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-
                 DefaultTableModel selectAllModel = (DefaultTableModel) newReceiptTable.getModel();
 
                 int reply = JOptionPane.showConfirmDialog(null,
