@@ -1,8 +1,12 @@
     package za.ac.cput.PRT362s_Project_2021;
 
+    import net.proteanit.sql.DbUtils;
+
     import javax.swing.*;
     import javax.swing.table.DefaultTableModel;
     import java.awt.*;
+    import java.awt.event.ActionEvent;
+    import java.awt.event.ActionListener;
     import java.sql.Connection;
     import java.sql.DriverManager;
     import java.sql.PreparedStatement;
@@ -14,67 +18,151 @@
     import java.sql.*;
     import java.util.Vector;
 
-    public class ReservationList{
+    public class ReservationList extends JFrame{
 
         private JPanel mainPanel;
+        private JTextField txtFieldName;
+        private JTextField txtFieldNo;
+        private JTextField txtFieldTime;
+        private JTextField txtFieldDate;
+        private JButton UPDATEButton;
+        private JTable table1;
+        private JButton RESETButton;
+        private JButton BACKButton;
+        private JButton SEARCHButton;
+        private JTextField txtID;
         private JTable jtbl;
-        private JButton exitBtn;
-        private void createUIComponents(){
 
+        public static void main(String[] args) {
+            JFrame frame = new JFrame("ReservationList");
+            frame.setContentPane(new ReservationList().mainPanel);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.pack();
+            frame.setVisible(true);
         }
-        public static void main(String[] args){
-            Connection con = null;
-            Statement st = null;
-            ResultSet rs = null; String s;
+        Connection con;
+        PreparedStatement pst;
 
+        public void connect() {
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                con = DriverManager.getConnection("jdbc:mysql://localhost/testdb", "root", "");
+                System.out.println("Successs");
+            } catch (ClassNotFoundException ex) {
+                ex.printStackTrace();
 
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        void table_load()
+        {
+            try
+            {
+                pst = con.prepareStatement("select * from reservation_list");
+                ResultSet rs = pst.executeQuery();
+                table1.setModel(DbUtils.resultSetToTableModel(rs));
+            }
+            catch (SQLException e)
+            {
+                e.printStackTrace();
+            }
+        }
 
+        public ReservationList() {
+            connect();
+            table_load();
+            UPDATEButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String name, noppl, time,date;
+                    name = txtFieldName.getText();
+                    noppl = txtFieldNo.getText();
+                    time = txtFieldTime.getText();
+                    date = txtFieldDate.getText();
+                    try {
+                        pst = con.prepareStatement("update reservation_list set name = ?,num_people = ?,booking_time = ?, date = ? where name = ?");
+                        pst.setString(1, name);
+                        pst.setString(2, noppl);
+                        pst.setString(3, time);
+                        pst.setString(4, date);
+                        pst.setString(5, name);
 
-            try{ con = DriverManager.getConnection("jdbc:mysql://localhost/testdb","root","");
-                st = con.createStatement();
-                s = "select * from reservation_list";
-                rs = st.executeQuery(s);
-                ResultSetMetaData rsmt = rs.getMetaData();
-                int c = rsmt.getColumnCount();
-                Vector column = new Vector(c);
-
-                for(int i = 1; i <= c; i++) {
-                    column.add(rsmt.getColumnName(i));
-                }
-
-                Vector data = new Vector();
-                Vector row = new Vector();
-
-                while(rs.next()) {
-                    row = new Vector(c);
-
-                    for(int i = 1; i <= c; i++){
-                        row.add(rs.getString(i));
+                        pst.executeUpdate();
+                        JOptionPane.showMessageDialog(null, "Booking Updated");
+                        table_load();
+                        txtFieldName.setText("");
+                        txtFieldNo.setText("");
+                        txtFieldDate.setText("");
+                        txtFieldTime.setText("");
+                        txtFieldName.requestFocus();
                     }
 
-                    data.add(row);
+                    catch (SQLException e1)
+                    {
+                        e1.printStackTrace();
+                    }
                 }
 
-                JFrame frame = new JFrame();
-                frame.setSize(500,120);
-                frame.setLocationRelativeTo(null);
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                JPanel mainPanel = new JPanel();
-                JTable jtbl = new JTable(data,column);
-                JScrollPane jsp = new JScrollPane(jtbl);
-                mainPanel.setLayout(new BorderLayout());
-                mainPanel.add(jsp,BorderLayout.CENTER);
-                frame.setContentPane(mainPanel); frame.setVisible(true);
+            });
+            SEARCHButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try{
+                        String name = txtID.getText();
 
-            }catch(Exception e){ JOptionPane.showMessageDialog(null, "ERROR"); }
-            finally{
-                try{ st.close();
-                    rs.close();
-                    con.close();
+                        pst = con.prepareStatement("select name ,num_people,booking_time,date from reservation_list where name = ?");
+                        pst.setString(1, name);
+                        ResultSet rs = pst.executeQuery();
+
+                        if(rs.next()==true)
+                        {
+                            String fName = rs.getString(1);
+                            String fNum = rs.getString(2);
+                            String fTime = rs.getString(3);
+                            String fDate = rs.getString(4);
+
+                            txtFieldName.setText(fName);
+                            txtFieldNo.setText(fNum);
+                            txtFieldTime.setText(fTime);
+                            txtFieldDate.setText(fDate);
+
+                        }
+                        else
+                        {
+                            txtFieldName.setText("");
+                            txtFieldNo.setText("");
+                            txtFieldTime.setText("");
+                            txtFieldDate.setText("");
+                            JOptionPane.showMessageDialog(null,"Booking cannot be found");
+
+                        }
+                    }
+                    catch (SQLException ex)
+                    {
+                        ex.printStackTrace();
+                    }
                 }
-                catch(Exception e){ JOptionPane.showMessageDialog(null, "ERROR CLOSE");
+
+            });
+            BACKButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Reservation reservation = new Reservation();
+                    reservation.show();
+                    dispose();
                 }
-            }
+            });
+            RESETButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    txtFieldDate.setText("");
+                    txtFieldTime.setText("");
+                    txtFieldNo.setText("");
+                    txtFieldName.setText("");
+                    txtID.setText("");
+                }
+            });
         }
     }
 

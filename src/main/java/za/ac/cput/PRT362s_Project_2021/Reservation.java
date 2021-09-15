@@ -42,8 +42,8 @@
 
                         try {
 
-                            //Class.forName("com.mysql.jdbc.Driver");
-                            Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/testdb?useSSL=false","root","");
+                            Class.forName("com.mysql.jdbc.Driver");
+                            Connection connect = DriverManager.getConnection("jdbc:mysql://localhost:3306/testdb?useSSL=false","root",null);
 
 
                             String sql = "INSERT INTO reservation_list " + "VALUES ('"+name+"' ,'"+ num_people+"','"+ booking_time+"','"+ date+"')";
@@ -82,8 +82,12 @@
                 SHOWBOOKINGSButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                       // createTable();
                         ReservationList reservationList = new ReservationList();
+                        reservationList.show();
+                        dispose();
                     }
+
                 });
             }
 
@@ -94,10 +98,12 @@
                 //createTable();
             }
 
-          /*  private void createTable(){
+            private void createTable(){
+
 
                 try{
-                    con = DriverManager.getConnection("jdbc:mysql://localhost/testdb","root","");
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    con = DriverManager.getConnection("jdbc:mysql://localhost:3306/testdb?useSSL=false","root","");
                     st = con.createStatement();
                     s = "select * from reservation_list";
                     rs = st.executeQuery(s);
@@ -147,7 +153,9 @@
                     catch(Exception e){ JOptionPane.showMessageDialog(null, "ERROR CLOSE");
                     }
                 }
-            }*/
+            }
+
+
             public static void main(String[] args) {
                 JFrame frame = new Reservation();
                 frame.setTitle("Reservation");
